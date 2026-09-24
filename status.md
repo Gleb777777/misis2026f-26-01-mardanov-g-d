@@ -1,6 +1,5 @@
-STAMP: 20260919-085006
+STAMP: 20260924-092338
 ERROR: file CMakeLists.txt is absent
-ERROR: file prj.codeforces/CMakeLists.txt is absent
 ERROR: file prj.codeforces/0004a.cpp is absent
 ERROR: file prj.codeforces/0263a.cpp is absent
 ERROR: file prj.codeforces/0271a.cpp is absent
