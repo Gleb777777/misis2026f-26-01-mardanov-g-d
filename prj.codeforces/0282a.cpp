@@ -1,0 +1,20 @@
+#include <iostream>
+#include <string>
+
+int main() {
+    int n;
+    std::cin >> n;
+    int x = 0;
+    for (int i = 0; i < n; i++) {
+        std::string command;
+        std::cin >> command;
+        if (command.find('+') != std::string::npos) {
+            x += 1;
+        }
+        else {
+            x -= 1;
+        }
+    }
+    std::cout << x;
+    return 0;
+}
