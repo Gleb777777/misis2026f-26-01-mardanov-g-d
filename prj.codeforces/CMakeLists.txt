@@ -8,5 +8,5 @@ file(GLOB SOURCES "*.cpp")
 
 foreach(SOURCE_FILE ${SOURCES})
     get_filename_component(EXE_NAME ${SOURCE_FILE} NAME_WE)
-    add_executable(${EXE_NAME} ${SOURCE_FILE})
+    add_executable(${EXE_NAME} ${SOURCE_FILE} "118a.cpp")
 endforeach()
