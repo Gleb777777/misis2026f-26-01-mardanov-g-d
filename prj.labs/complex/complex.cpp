@@ -63,33 +63,32 @@ int main()
     Complex z;
     z += Complex(8.0);
     
-    // Тесты парсинга из оригинального кода
+    
     testParse("{8.9,9}");
     testParse("{8.9, 9}");
     testParse("{8.9,9");
     
-    // Тесты для новых операторов
+    
     Complex a(5.0, 3.0); // 5 + 3i
     Complex b(2.0, 1.0); // 2 + 1i
     
-    a -= b; // (5-2) + (3-1)i = 3 + 2i
+    a -= b; 
     cout << "a -= b: " << a << endl;
     
-    a -= 1.0; // (3-1) + 2i = 2 + 2i
+    a -= 1.0; 
     cout << "a -= 1.0: " << a << endl;
     
-    Complex c(1.0, 2.0); // 1 + 2i
-    Complex d(3.0, 4.0); // 3 + 4i
-    c *= d; // (1*3 - 2*4) + (1*4 + 2*3)i = -5 + 10i
+    Complex c(1.0, 2.0); 
+    Complex d(3.0, 4.0); 
+    c *= d; 
     cout << "c *= d: " << c << endl;
     
-    c *= 2.0; // Умножение на скаляр
+    c *= 2.0; 
     cout << "c *= 2.0: " << c << endl;
     
     return 0;
 }
 
-// --- РЕАЛИЗАЦИЯ МЕТОДОВ И ОПЕРАТОРОВ ---
 
 Complex::Complex(const double real)
     : Complex(real, 0.0)
@@ -118,7 +117,7 @@ Complex& Complex::operator-=(const Complex& rhs)
 
 Complex& Complex::operator*=(const Complex& rhs)
 {
-    // (a + bi) * (c + di) = (ac - bd) + (ad + bc)i
+    
     double new_re = re * rhs.re - im * rhs.im;
     double new_im = re * rhs.im + im * rhs.re;
     re = new_re;
@@ -156,7 +155,7 @@ std::istream& Complex::readFrom(std::istream& istrm)
     char leftBrace(0);
     double real(0.0);
     char comma(0);
-    double imaginary(0.0); // Исправлена опечатка imaganary -> imaginary
+    double imaginary(0.0); 
     char rightBrace(0);
     
     istrm >> leftBrace >> real >> comma >> imaginary >> rightBrace;
