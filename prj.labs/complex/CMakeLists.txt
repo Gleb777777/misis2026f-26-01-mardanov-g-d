@@ -1,3 +1,2 @@
-cmake_minimum_required(VERSION 3.10)
-project(complex)
-add_executable(complex complex.cpp)
+add_library(complex complex.cpp complex.hpp)
+target_include_directories(complex PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/..)

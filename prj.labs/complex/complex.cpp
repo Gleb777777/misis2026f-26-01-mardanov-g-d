@@ -1,129 +1,81 @@
+#include <complex/complex.hpp>
+
+#include <cmath>
 #include <iostream>
-#include <sstream>
+#include <limits>
+#include <stdexcept>
 
-struct Complex {
-    Complex() {}
-    explicit Complex(const double real);
-    Complex(const double real, const double imaginary);
-
-    bool operator==(const Complex& rhs) const { return (re == rhs.re) && (im == rhs.im); }
-    bool operator!=(const Complex& rhs) const { return !operator==(rhs); }
-
-    Complex& operator+=(const Complex& rhs);
-    Complex& operator+=(const double rhs) { return operator+=(Complex(rhs)); }
-
-    Complex& operator-=(const Complex& rhs);
-    Complex& operator-=(const double rhs) { return operator-=(Complex(rhs)); }
-    Complex& operator*=(const Complex& rhs);
-    Complex& operator*=(const double rhs);
-
-    std::ostream& writeTo(std::ostream& ostrm) const;
-    std::istream& readFrom(std::istream& istrm);
-
-    double re{ 0.0 };
-    double im{ 0.0 };
-
-    static const char leftBrace{ '{' };
-    static const char separator{ ',' };
-    static const char rightBrace{ '}' };
-};
-
-Complex operator+(const Complex& lhs, const Complex& rhs);
-Complex operator-(const Complex& lhs, const Complex& rhs);
-
-inline std::ostream& operator<<(std::ostream& ostrm, const Complex& rhs)
-{
-    return rhs.writeTo(ostrm);
+namespace {
+    constexpr double eps = 2 * std::numeric_limits<double>::epsilon();
 }
 
-inline std::istream& operator>>(std::istream& istrm, Complex& rhs)
-{
-    return rhs.readFrom(istrm);
+Complex Complex::operator-() const noexcept { return Complex(-re, -im); }
+
+bool Complex::operator==(const Complex& rhs) const noexcept {
+    return std::abs(re - rhs.re) <= eps && std::abs(im - rhs.im) <= eps;
 }
+bool Complex::operator!=(const Complex& rhs) const noexcept { return !operator==(rhs); }
 
-bool testParse(const std::string& str)
-{
-    using namespace std;
-    istringstream istrm(str);
-    Complex z;
-    istrm >> z;
-    if (istrm.good()) {
-        cout << "Read success: " << str << " -> " << z << endl;
-    }
-    else {
-        cout << "Read error  : " << str << " -> " << z << endl;
-    }
-    return istrm.good();
-}
-
-int main()
-{
-    using namespace std;
-
-    Complex z;
-    z += Complex(8.0);
-    testParse("{8.9,9}");
-    testParse("{8.9, 9}");
-    testParse("{8.9,9");
-    return 0;
-}
-
-Complex::Complex(const double real)
-    : Complex(real, 0.0)
-{
-}
-
-Complex::Complex(const double real, const double imaginary)
-    : re(real)
-    , im(imaginary)
-{
-}
-
-Complex& Complex::operator+=(const Complex& rhs)
-{
+Complex& Complex::operator+=(const Complex& rhs) noexcept {
     re += rhs.re;
     im += rhs.im;
     return *this;
 }
+Complex& Complex::operator+=(const double rhs) noexcept { return operator+=(Complex(rhs)); }
 
-Complex operator+(const Complex& lhs, const Complex& rhs)
-{
-    Complex sum(lhs);
-    sum += rhs;
-    return sum;
+Complex& Complex::operator-=(const Complex& rhs) noexcept {
+    re -= rhs.re;
+    im -= rhs.im;
+    return *this;
 }
+Complex& Complex::operator-=(const double rhs) noexcept { return operator-=(Complex(rhs)); }
 
-Complex operator-(const Complex& lhs, const Complex& rhs)
-{
-    return Complex(lhs.re - rhs.re, lhs.im - rhs.im);
+Complex& Complex::operator*=(const Complex& rhs) noexcept {
+    const double new_re = re * rhs.re - im * rhs.im;
+    const double new_im = re * rhs.im + im * rhs.re;
+    re = new_re;
+    im = new_im;
+    return *this;
 }
-
-Complex& Complex::operator*=(const double rhs)
-{
+Complex& Complex::operator*=(const double rhs) noexcept {
     re *= rhs;
     im *= rhs;
     return *this;
 }
 
-std::ostream& Complex::writeTo(std::ostream& ostrm) const
-{
+Complex& Complex::operator/=(const Complex& rhs) {
+    const double denom = rhs.re * rhs.re + rhs.im * rhs.im;
+    if (0.0 == denom) {
+        throw std::invalid_argument("Division by zero in Complex::operator/=");
+    }
+    const double new_re = (re * rhs.re + im * rhs.im) / denom;
+    const double new_im = (im * rhs.re - re * rhs.im) / denom;
+    re = new_re;
+    im = new_im;
+    return *this;
+}
+Complex& Complex::operator/=(const double rhs) {
+    if (0.0 == rhs) {
+        throw std::invalid_argument("Division by zero in Complex::operator/=");
+    }
+    re /= rhs;
+    im /= rhs;
+    return *this;
+}
+
+std::ostream& Complex::write_to(std::ostream& ostrm) const noexcept {
     ostrm << leftBrace << re << separator << im << rightBrace;
     return ostrm;
 }
 
-std::istream& Complex::readFrom(std::istream& istrm)
-{
-    char leftBrace(0);
-    double real(0.0);
-    char comma(0);
-    double imaganary(0.0);
-    char rightBrace(0);
-    istrm >> leftBrace >> real >> comma >> imaganary >> rightBrace;
-    if (istrm.good()) {
-        if ((Complex::leftBrace == leftBrace) && (Complex::separator == comma)
-            && (Complex::rightBrace == rightBrace)) {
+std::istream& Complex::read_from(std::istream& istrm) noexcept {
+    char left = 0, comma = 0, right = 0;
+    double real = 0.0, imaginary = 0.0;
+    istrm >> left >> real >> comma >> imaginary >> right;
+    if (!istrm.fail()) {
+        if (leftBrace == left && separator == comma && rightBrace == right) {
             re = real;
-            im = imaganary;
+            im = imaginary;
         }
         else {
             istrm.setstate(std::ios_base::failbit);
@@ -131,3 +83,19 @@ std::istream& Complex::readFrom(std::istream& istrm)
     }
     return istrm;
 }
+
+Complex operator+(const Complex& lhs, const Complex& rhs) noexcept { return Complex(lhs) += rhs; }
+Complex operator+(const Complex& lhs, const double rhs) noexcept { return Complex(lhs) += rhs; }
+Complex operator+(const double lhs, const Complex& rhs) noexcept { return Complex(lhs) += rhs; }
+
+Complex operator-(const Complex& lhs, const Complex& rhs) noexcept { return Complex(lhs) -= rhs; }
+Complex operator-(const Complex& lhs, const double rhs) noexcept { return Complex(lhs) -= rhs; }
+Complex operator-(const double lhs, const Complex& rhs) noexcept { return Complex(lhs) -= rhs; }
+
+Complex operator*(const Complex& lhs, const Complex& rhs) noexcept { return Complex(lhs) *= rhs; }
+Complex operator*(const Complex& lhs, const double rhs) noexcept { return Complex(lhs) *= rhs; }
+Complex operator*(const double lhs, const Complex& rhs) noexcept { return Complex(lhs) *= rhs; }
+
+Complex operator/(const Complex& lhs, const Complex& rhs) { return Complex(lhs) /= rhs; }
+Complex operator/(const Complex& lhs, const double rhs) { return Complex(lhs) /= rhs; }
+Complex operator/(const double lhs, const Complex& rhs) { return Complex(lhs) /= rhs; }
