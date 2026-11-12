@@ -57,3 +57,40 @@ TEST_CASE("[rational] - io") {
 	in >> r;
 	CHECK(r == Rational(-2, 3));
 }
+TEST_CASE("[rational] - gcd normalization") {
+	CHECK(Rational(12, 18) == Rational(2, 3));
+	CHECK(Rational(-12, -18) == Rational(2, 3));
+	CHECK(Rational(0, -7).num() == 0);
+	CHECK(Rational(0, -7).den() == 1);
+	CHECK(Rational(17, 5).den() == 5);
+}
+
+TEST_CASE("[rational] - no overflow in intermediate values") {
+	CHECK(Rational(50000, 99999) + Rational(1, 99999) == Rational(16667, 33333));
+}
+
+TEST_CASE("[rational] - compound assignment") {
+	Rational r(1, 2);
+	r += Rational(1, 2);
+	CHECK(r == Rational(1));
+	r *= 4;
+	CHECK(r == Rational(4));
+	r /= 8;
+	CHECK(r == Rational(1, 2));
+	r -= 1;
+	CHECK(r == Rational(-1, 2));
+	CHECK_THROWS(r /= 0);
+}
+
+TEST_CASE("[rational] - io errors") {
+	Rational r(7);
+	std::istringstream bad_den("1/0");
+	bad_den >> r;
+	CHECK(bad_den.fail());
+	CHECK(r == Rational(7));
+
+	std::istringstream garbage("abc");
+	garbage >> r;
+	CHECK(garbage.fail());
+	CHECK(r == Rational(7));
+}

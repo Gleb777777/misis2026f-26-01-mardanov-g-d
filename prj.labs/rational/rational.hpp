@@ -43,7 +43,7 @@ public:
 
 private:
 	std::int32_t num_ = 0;  // числитель
-	std::int32_t den_ = 1;  // знаменатель, > 0
+	std::int32_t den_ = 1;  // знаменатель > 0
 
 	void normalize() noexcept;
 };

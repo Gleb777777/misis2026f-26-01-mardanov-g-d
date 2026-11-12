@@ -1,8 +1,29 @@
 #include <rational/rational.hpp>
 
 #include <iostream>
-#include <numeric>
 #include <stdexcept>
+
+namespace {
+    std::int64_t gcd64(std::int64_t a, std::int64_t b) noexcept {
+        if (a < 0) a = -a;
+        if (b < 0) b = -b;
+        while (b != 0) {
+            const std::int64_t t = a % b;
+            a = b;
+            b = t;
+        }
+        return a;
+    }
+
+    Rational reduced(std::int64_t num, std::int64_t den) {
+        if (den < 0) {
+            num = -num;
+            den = -den;
+        }
+        const std::int64_t g = gcd64(num, den);
+        return Rational(static_cast<std::int32_t>(num / g), static_cast<std::int32_t>(den / g));
+    }
+}
 
 Rational::Rational(const std::int32_t num, const std::int32_t den)
     : num_(num), den_(den) {
@@ -17,7 +38,7 @@ void Rational::normalize() noexcept {
         num_ = -num_;
         den_ = -den_;
     }
-    const std::int32_t g = std::gcd(num_, den_);
+    const std::int32_t g = static_cast<std::int32_t>(gcd64(num_, den_));
     if (g > 1) {
         num_ /= g;
         den_ /= g;
@@ -36,31 +57,21 @@ bool Rational::operator>(const Rational& rhs) const noexcept { return rhs < *thi
 bool Rational::operator>=(const Rational& rhs) const noexcept { return !(*this < rhs); }
 
 Rational& Rational::operator+=(const Rational& rhs) noexcept {
-    num_ = num_ * rhs.den_ + rhs.num_ * den_;
-    den_ *= rhs.den_;
-    normalize();
-    return *this;
+    return *this = reduced(std::int64_t{ num_ } * rhs.den_ + std::int64_t{ rhs.num_ } * den_,
+        std::int64_t{ den_ } * rhs.den_);
 }
 Rational& Rational::operator-=(const Rational& rhs) noexcept {
-    num_ = num_ * rhs.den_ - rhs.num_ * den_;
-    den_ *= rhs.den_;
-    normalize();
-    return *this;
+    return *this = reduced(std::int64_t{ num_ } * rhs.den_ - std::int64_t{ rhs.num_ } * den_,
+        std::int64_t{ den_ } * rhs.den_);
 }
 Rational& Rational::operator*=(const Rational& rhs) noexcept {
-    num_ *= rhs.num_;
-    den_ *= rhs.den_;
-    normalize();
-    return *this;
+    return *this = reduced(std::int64_t{ num_ } * rhs.num_, std::int64_t{ den_ } * rhs.den_);
 }
 Rational& Rational::operator/=(const Rational& rhs) {
     if (0 == rhs.num_) {
         throw std::invalid_argument("Division by zero in Rational::operator/=");
     }
-    num_ *= rhs.den_;
-    den_ *= rhs.num_;  // знак может стать отрицательным, normalize это исправит
-    normalize();
-    return *this;
+    return *this = reduced(std::int64_t{ num_ } * rhs.den_, std::int64_t{ den_ } * rhs.num_);
 }
 
 Rational& Rational::operator+=(const std::int32_t rhs) noexcept { return operator+=(Rational(rhs)); }
