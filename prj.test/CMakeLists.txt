@@ -7,3 +7,5 @@ target_include_directories(rational_test PRIVATE ${CMAKE_SOURCE_DIR}/prj.thirdpa
 add_executable(stacka_test stacka_test.cpp)
 target_link_libraries(stacka_test PRIVATE stacka)
 target_include_directories(stacka_test PRIVATE ${CMAKE_SOURCE_DIR}/prj.thirdparty)
+add_executable(queuea_test queuea_test.cpp)
+target_link_libraries(queuea_test PRIVATE queuea)
