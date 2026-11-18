@@ -36,7 +36,7 @@ int main() {
     }
 
     for (int i = 1; i <= v; i++) {
-        std::cout << col[i]
+        std::cout << col[i];
     }
     std::cout << "\n";
     return 0;
