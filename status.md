@@ -1,4 +1,4 @@
-STAMP: 20261112-142204
+STAMP: 20261119-080528
 ERROR: file codeforces.id is absent
 ERROR: file codeforces.id is absent
 ERROR: file prj.codeforces/0978a.cpp is absent
@@ -14,7 +14,11 @@ ERROR: file prj.codeforces/1512b.cpp is absent
 ERROR: file prj.codeforces/1585a.cpp is absent
 ERROR: file prj.codeforces/1680b.cpp is absent
 ERROR: file prj.codeforces/1692c.cpp is absent
-ERROR: CMake generator failed
+ERROR: file prj.labs/stackl/CMakeLists.txt is absent
+OK: CMake generator successed
 OK: folder prj.codeforces structure is correct
-ERROR: lab complex - test build failed
-ERROR: lab rational - test build failed
+STATUS: lab complex - test-ok
+STATUS: lab complex_io - test-failed
+STATUS: lab rational - test-ok
+STATUS: lab rational_io - test-failed
+ERROR: lab queuea - test build failed
